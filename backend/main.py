@@ -37,7 +37,6 @@ app.include_router(emotion_router)
 app.include_router(summary_route.router)
 app.include_router(chord_router)
 app.include_router(artist_info_router)
-app.include_router(playlist_router.router)
 
 # CORS setup
 app.add_middleware(
