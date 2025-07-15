@@ -15,7 +15,6 @@ from backend.emotion_analyzer import analyze_emotions
 from backend.routes import summary_route
 from backend.routes.chord_router import router as chord_router
 from backend.routes.artist_info_router import router as artist_info_router
-from backend.routes import playlist_router
 
 
 
