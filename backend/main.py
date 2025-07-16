@@ -89,6 +89,7 @@ def fetch_lyrics_and_annotations(title, artist=None):
         print(f"🎯 Matched: {genius_title} by {genius_artist}")
 
         genius = lyricsgenius.Genius(GENIUS_API_TOKEN, skip_non_songs=True, excluded_terms=["(Remix)", "(Live)"])
+        print("⚠️ About to call lyricsgenius.search_song()")
         song = genius.search_song(genius_title, genius_artist)
 
         if not song:
