@@ -26,9 +26,21 @@ load_dotenv()
 GENIUS_API_TOKEN = os.getenv("GENIUS_API_TOKEN")
 NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY")
 
-requests.Session.request = lambda self, method, url, **kwargs: requests.request(
-    method, url, headers={**kwargs.get('headers', {}), "User-Agent": "Mozilla/5.0"}, **kwargs
-)
+original_get = requests.get
+original_post = requests.post
+
+def custom_get(url, **kwargs):
+    headers = kwargs.pop("headers", {})
+    headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+    return original_get(url, headers=headers, **kwargs)
+
+def custom_post(url, **kwargs):
+    headers = kwargs.pop("headers", {})
+    headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+    return original_post(url, headers=headers, **kwargs)
+
+requests.get = custom_get
+requests.post = custom_post
 
 
 # Setup OpenAI (NVIDIA NIM endpoint)
