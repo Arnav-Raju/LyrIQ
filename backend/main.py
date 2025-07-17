@@ -88,7 +88,11 @@ def fetch_lyrics_and_annotations(title, artist=None):
 
         print(f"🎯 Matched: {genius_title} by {genius_artist}")
 
-        genius = lyricsgenius.Genius(GENIUS_API_TOKEN, skip_non_songs=True, excluded_terms=["(Remix)", "(Live)"])
+        genius = lyricsgenius.Genius(GENIUS_API_TOKEN,skip_non_songs=True,excluded_terms=["(Remix)", "(Live)"])
+        # 👇 Patch the User-Agent to avoid 403 errors on Render or cloud servers
+        genius.session.headers.update({
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+        })
         print("⚠️ About to call lyricsgenius.search_song()")
         song = genius.search_song(genius_title, genius_artist)
 
