@@ -26,6 +26,11 @@ load_dotenv()
 GENIUS_API_TOKEN = os.getenv("GENIUS_API_TOKEN")
 NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY")
 
+requests.Session.request = lambda self, method, url, **kwargs: requests.request(
+    method, url, headers={**kwargs.get('headers', {}), "User-Agent": "Mozilla/5.0"}, **kwargs
+)
+
+
 # Setup OpenAI (NVIDIA NIM endpoint)
 client = OpenAI(
     base_url="https://integrate.api.nvidia.com/v1",
@@ -71,7 +76,6 @@ def fetch_lyrics_and_annotations(title, artist=None):
 
     try:
         search_url = f"https://api.genius.com/search?q={requests.utils.quote(query)}"
-
         response = requests.get(search_url, headers=headers, timeout=10)
 
         if response.status_code != 200:
@@ -84,22 +88,17 @@ def fetch_lyrics_and_annotations(title, artist=None):
         song_data = hits[0]["result"]
         genius_title = song_data["title"]
         genius_artist = song_data["primary_artist"]["name"]
-        genius_url = song_data["url"]  # ✅ Get the Genius song URL
+        genius_url = song_data["url"]
 
         print(f"🎯 Matched: {genius_title} by {genius_artist}")
 
-        genius = lyricsgenius.Genius(GENIUS_API_TOKEN,skip_non_songs=True,excluded_terms=["(Remix)", "(Live)"])
-        # 👇 Patch the User-Agent to avoid 403 errors on Render or cloud servers
-        genius.session.headers.update({
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
-        })
-        print("⚠️ About to call lyricsgenius.search_song()")
+        genius = lyricsgenius.Genius(GENIUS_API_TOKEN, skip_non_songs=True, excluded_terms=["(Remix)", "(Live)"])
         song = genius.search_song(genius_title, genius_artist)
 
         if not song:
             return None, None, "LyricsGenius failed to fetch lyrics"
 
-        return song.lyrics, genius_url, None  # ✅ Return lyrics and URL
+        return song.lyrics, genius_url, None
 
     except Exception as e:
         return None, None, str(e)
